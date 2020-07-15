@@ -993,15 +993,10 @@ dependencies = [
 
 [[package]]
 name = "gstreamer"
-<<<<<<< HEAD
-version = "0.15.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce8664a114cd6ec16bece783d5eee59496919915b1f6884400ba4a953274a163"
-=======
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d7624951fac2854554e20a1823a2b87ab6db024894afcf90a2610f8783c3b9"
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
+
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -1037,15 +1032,9 @@ dependencies = [
 
 [[package]]
 name = "gstreamer-base"
-<<<<<<< HEAD
-version = "0.15.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42552f75cc6c260b0be180d5c955f4cd74bd170289c622404c25f1210b521c12"
-=======
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "872893487ce8876f18c63730402822804c5762869f631d8e3e6b18aafc8399f0"
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
 dependencies = [
  "bitflags",
  "glib",
@@ -1104,15 +1093,9 @@ dependencies = [
 
 [[package]]
 name = "gstreamer-player"
-<<<<<<< HEAD
-version = "0.15.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04b3497c644f0e4fa92195930801baabbae74ddb208a2a9f2127f36bf4d8f698"
-=======
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90e8a850be21b18fb21f21fa16394bfc176013f7fffdc6719db0ea23b3c99a2b"
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
 dependencies = [
  "bitflags",
  "glib",
@@ -1153,15 +1136,9 @@ dependencies = [
 
 [[package]]
 name = "gstreamer-video"
-<<<<<<< HEAD
-version = "0.15.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ad7e69a940246d41428c72072a376785716b3669da333cbee1156fd90574dc9"
-=======
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42a52c141d83113e6dd080347ca49ef9be296e7900e081f2b67eaad6a3d5ef26"
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
 dependencies = [
  "bitflags",
  "futures-channel",
@@ -1857,15 +1834,6 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
-name = "object"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ab52be62400ca80aa00285d25253d7f7c437b7375c4de678f5405d3afe82ca5"
-
-[[package]]
-=======
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
 name = "once_cell"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2685,12 +2653,9 @@ name = "strum"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57bd81eb48f4c437cadc685403cad539345bf703d78e63707418431cecd4522b"
-<<<<<<< HEAD
 dependencies = [
  "strum_macros",
 ]
-=======
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
 
 [[package]]
 name = "strum_macros"
@@ -2699,15 +2664,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "87c85aa3f8ea653bfd3ddf25f7ee357ee4d204731f6aa9ad04002306f6e2774c"
 dependencies = [
  "heck",
-<<<<<<< HEAD
- "proc-macro2 1.0.19",
- "quote 1.0.7",
- "syn 1.0.36",
-=======
  "proc-macro2 1.0.9",
  "quote 1.0.2",
  "syn 1.0.16",
->>>>>>> 783e68d... bump gtk-rs & gstreamer crates
+
 ]
 
 [[package]]
@@ -3079,9 +3039,6 @@ checksum = "6454029bf181f092ad1b853286f23e2c507d8e8194d01d92da4a55c274a5508c"
 
 [[package]]
 name = "vec_map"
-<<<<<<< HEAD
-version = "0.8.2"
-=======
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05c78687fb1a80548ae3250346c3db86a80a7cdd77bda190189f2d0a0987c81a"

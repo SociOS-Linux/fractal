@@ -200,13 +200,11 @@ pub fn new(
                         Continue(true)
                     }
                     Ok(Ok(fname)) => {
-                        if let Ok(pixbuf) = gdk_pixbuf::Pixbuf::new_from_file(fname) {
+                        if let Ok(pixbuf) = gdk_pixbuf::Pixbuf::from_file(fname) {
                             let atom = gdk::Atom::intern("CLIPBOARD");
                             let clipboard = gtk::Clipboard::get(&atom);
-
                             clipboard.set_image(&pixbuf);
                         }
-
                         Continue(false)
                     }
                     Ok(Err(err)) => {
