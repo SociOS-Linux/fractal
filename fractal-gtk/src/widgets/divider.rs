@@ -56,7 +56,9 @@ impl NewMessageDivider {
         revealer.connect_property_child_revealed_notify(clone!(
         @weak row as r
         => move |_| {
-            unsafe { r.destroy(); }
+            if let Some(container) = r.get_parent().and_then(|widget| widget.downcast::<gtk::ListBox>().ok()) {
+                container.remove(&r);
+            }
             remove_divider();
         }));
         NewMessageDivider {
