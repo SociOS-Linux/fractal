@@ -45,7 +45,7 @@ impl App {
 
         let mut op = self.op.clone();
         msg_entry.connect_key_release_event(move |_, ev| {
-            if gdk::keyval_to_unicode(*ev.get_keyval()).is_some() {
+            if ev.get_keyval().to_unicode().is_some() {
                 op.lock().unwrap().send_typing();
             }
             Inhibit(false)
