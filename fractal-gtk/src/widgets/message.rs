@@ -158,9 +158,7 @@ impl MessageBox {
             self.small_widget(thread_pool, &msg)
         };
         if let Some(eb) = self.eventbox.get_child() {
-            unsafe {
-                eb.destroy();
-            } // clean the eventbox
+            self.eventbox.remove(&eb);
         }
         self.eventbox.add(&w);
         self.row.show_all();

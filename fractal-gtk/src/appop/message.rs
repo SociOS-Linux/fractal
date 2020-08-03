@@ -98,15 +98,15 @@ impl AppOp {
         None
     }
 
-    pub fn clear_tmp_msgs(&mut self) {
+    pub fn clear_tmp_msgs(&mut self) -> Option<()> {
+        let messages = self.history.as_ref()?.get_listbox();
         for t in self.msg_queue.iter_mut() {
             if let Some(ref w) = t.widget {
-                unsafe {
-                    w.destroy();
-                }
+                messages.remove(w);
             }
             t.widget = None;
         }
+        None
     }
 
     pub fn append_tmp_msgs(&mut self) -> Option<()> {
@@ -182,18 +182,18 @@ impl AppOp {
         None
     }
 
-    pub fn msg_sent(&mut self, _txid: String, evid: Option<EventId>) {
+    pub fn msg_sent(&mut self, _txid: String, evid: Option<EventId>) -> Option<()> {
+        let messages = self.history.as_ref()?.get_listbox();
         if let Some(ref mut m) = self.msg_queue.pop() {
             if let Some(ref w) = m.widget {
-                unsafe {
-                    w.destroy();
-                }
+                messages.remove(w);
             }
             m.widget = None;
             m.msg.id = evid;
             self.show_room_messages(vec![m.msg.clone()]);
         }
         self.force_dequeue_message();
+        None
     }
 
     pub fn retry_send(&mut self) {
@@ -357,15 +357,17 @@ impl AppOp {
     /// This method is called when a tmp message with an attach is sent correctly
     /// to the matrix media server and we've the real url to use so we can
     /// replace the tmp message with the same id with this new one
-    pub fn attached_file(&mut self, msg: Message) {
+    pub fn attached_file(&mut self, msg: Message) -> Option<()> {
+        let messages = self.history.as_ref()?.get_listbox();
         let p = self.msg_queue.iter().position(|m| m.msg == msg);
         if let Some(i) = p {
             let w = self.msg_queue.remove(i);
             if let Some(w) = w.widget {
-                unsafe { w.destroy() }
+                messages.remove(&w);
             }
         }
         self.add_tmp_room_message(msg);
+        None
     }
 
     /* TODO: find a better name for this function */
