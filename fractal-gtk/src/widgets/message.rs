@@ -512,6 +512,12 @@ impl MessageBox {
                 start_playing,
             );
 
+            let overlay = Overlay::new();
+            let video_widget = player.get_video_widget();
+            video_widget.set_size_request(-1, 390);
+            VideoPlayerWidget::auto_adjust_video_dimensions(&player);
+            overlay.add(&video_widget);
+
             let play_button = gtk::Button::new();
             let play_icon = gtk::Image::from_icon_name(
                 Some("media-playback-start-symbolic"),
@@ -555,6 +561,10 @@ impl MessageBox {
             let redactable = msg.redactable;
             let menu = MessageMenu::new(evid, &RowType::Video, &redactable, None, None);
             menu_button.set_popover(Some(&menu.get_popover()));
+
+            bx.pack_start(&overlay, true, true, 0);
+            self.connect_media_viewer(msg);
+            self.video_player = Some(player);
         }
         bx
     }
