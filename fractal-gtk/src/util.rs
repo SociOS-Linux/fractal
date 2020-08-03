@@ -1,5 +1,4 @@
 use crate::globals::CACHE_PATH;
-use failure::format_err;
 use failure::Error as FailError;
 use gdk::prelude::*;
 use gdk_pixbuf::Pixbuf;
@@ -22,8 +21,8 @@ pub fn cache_dir_path(dir: Option<&str>, name: &str) -> Result<PathBuf, IoError>
 }
 
 pub fn get_pixbuf_data(pb: &Pixbuf) -> Result<Vec<u8>, FailError> {
-    let image = cairo::ImageSurface::create(cairo::Format::ARgb32, pb.get_width(), pb.get_height())
-        .or_else(|_| Err(format_err!("Cairo Error")))?;
+    let image =
+        cairo::ImageSurface::create(cairo::Format::ARgb32, pb.get_width(), pb.get_height())?;
 
     let g = cairo::Context::new(&image);
     g.set_source_pixbuf(pb, 0.0, 0.0);
