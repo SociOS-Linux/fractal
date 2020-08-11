@@ -71,4 +71,10 @@ impl AppOp {
         panel.show_new_room_topic();
         None
     }
+
+    pub fn set_notifications_switch(&self, active: bool, sensitive: bool) -> Option<()> {
+        let panel = self.room_settings.clone()?;
+        panel.set_notifications_switch(active, sensitive);
+        None
+    }
 }

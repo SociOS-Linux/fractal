@@ -48,6 +48,12 @@ use fractal_api::r0::message::get_message_events::request as get_messages_events
 use fractal_api::r0::message::get_message_events::Direction as GetMessagesEventsDirection;
 use fractal_api::r0::message::get_message_events::Parameters as GetMessagesEventsParams;
 use fractal_api::r0::message::get_message_events::Response as GetMessagesEventsResponse;
+use fractal_api::r0::pushrules::delete_room_rules::request as delete_room_rules;
+use fractal_api::r0::pushrules::delete_room_rules::Parameters as DelRoomRulesParams;
+use fractal_api::r0::pushrules::get_room_rules::request as get_room_rules;
+use fractal_api::r0::pushrules::get_room_rules::Parameters as GetRoomRulesParams;
+use fractal_api::r0::pushrules::set_room_rules::request as set_room_rules;
+use fractal_api::r0::pushrules::set_room_rules::Parameters as SetRoomRulesParams;
 use fractal_api::r0::read_marker::set_read_marker::request as set_read_marker;
 use fractal_api::r0::read_marker::set_read_marker::Body as SetReadMarkerBody;
 use fractal_api::r0::read_marker::set_read_marker::Parameters as SetReadMarkerParameters;
@@ -930,5 +936,91 @@ pub fn set_language(
 
     HTTP_CLIENT.get_client().execute(request)?;
 
+    Ok(())
+}
+
+#[derive(Debug)]
+pub enum RoomNotify {
+    All,
+    DontNotify,
+    NotSet,
+}
+
+#[derive(Debug)]
+pub struct PushRulesError(ReqwestError);
+
+impl From<ReqwestError> for PushRulesError {
+    fn from(err: ReqwestError) -> Self {
+        Self(err)
+    }
+}
+
+impl HandleError for PushRulesError {
+    fn handle_error(&self) {
+        error!("PushRules: {}", self.0);
+    }
+}
+
+pub fn get_pushrules(
+    base: Url,
+    access_token: AccessToken,
+    room_id: RoomId,
+) -> Result<RoomNotify, PushRulesError> {
+    let params = GetRoomRulesParams { access_token };
+
+    let request = get_room_rules(base, &params, &room_id)?;
+
+    let mut value = RoomNotify::NotSet;
+
+    let response: Result<JsonValue, _> = HTTP_CLIENT.get_client().execute(request)?.json();
+
+    if let Ok(js) = response {
+        if let Some(array) = js["actions"].as_array() {
+            for v in array {
+                match v.as_str().unwrap_or_default() {
+                    "notify" => value = RoomNotify::All,
+                    "dont_notify" => value = RoomNotify::DontNotify,
+                    _ => {}
+                };
+            }
+        }
+    }
+
+    Ok(value)
+}
+
+pub fn set_pushrules(
+    base: Url,
+    access_token: AccessToken,
+    room_id: RoomId,
+    notify: RoomNotify,
+) -> Result<(), PushRulesError> {
+    if let RoomNotify::NotSet = notify {
+        return delete_pushrules(base, access_token, room_id);
+    }
+
+    let params = SetRoomRulesParams { access_token };
+    let js = match notify {
+        RoomNotify::DontNotify => json!({"actions": ["dont_notify"]}),
+        RoomNotify::All => json!({
+            "actions": ["notify", {"set_tweak": "sound", "value": "default"}]
+        }),
+        _ => json!({}),
+    };
+
+    let request = set_room_rules(base, &params, &room_id, &js)?;
+
+    HTTP_CLIENT.get_client().execute(request)?;
+    Ok(())
+}
+
+pub fn delete_pushrules(
+    base: Url,
+    access_token: AccessToken,
+    room_id: RoomId,
+) -> Result<(), PushRulesError> {
+    let params = DelRoomRulesParams { access_token };
+    let request = delete_room_rules(base, &params, &room_id)?;
+    HTTP_CLIENT.get_client().execute(request)?;
     Ok(())
 }

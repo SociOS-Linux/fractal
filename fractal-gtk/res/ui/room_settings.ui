@@ -212,7 +212,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="room_settings_notification_switch">
+                          <object class="GtkFrame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="margin_bottom">24</property>
@@ -245,7 +245,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkSwitch">
+                                          <object class="GtkSwitch" id="room_settings_notification_switch">
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                           </object>

@@ -30,6 +30,7 @@ pub struct RoomSettings {
     members_list: Option<MembersList>,
     server_url: Url,
     access_token: AccessToken,
+    switch_handler: Option<Rc<glib::SignalHandlerId>>,
 }
 
 impl RoomSettings {
@@ -61,6 +62,7 @@ impl RoomSettings {
             members_list: None,
             server_url,
             access_token,
+            switch_handler: None,
         }
     }
 
@@ -101,7 +103,7 @@ impl RoomSettings {
         None
     }
 
-    pub fn connect(&self) {
+    pub fn connect(&mut self) {
         let name_btn = self
             .builder
             .get_object::<gtk::Button>("room_settings_room_name_button")
@@ -122,6 +124,10 @@ impl RoomSettings {
             .builder
             .get_object::<gtk::Button>("room_settings_avatar_button")
             .expect("Can't find room_settings_avatar_button in ui file.");
+        let switch = self
+            .builder
+            .get_object::<gtk::Switch>("room_settings_notification_switch")
+            .expect("Can't find room_settings_notification_switch in ui file.");
 
         let this: Rc<RefCell<RoomSettings>> = Rc::new(RefCell::new(self.clone()));
 
@@ -183,6 +189,26 @@ impl RoomSettings {
                 }),
             );
         }
+
+        let switch_handler = switch.connect_property_active_notify(
+            clone!(@strong this => move |switch| {
+                let active = switch.get_active();
+                let notify = if active { room::RoomNotify::All } else { room::RoomNotify::DontNotify };
+                let server = this.borrow().server_url.clone();
+                let access_token = this.borrow().access_token.clone();
+                let room_id = this.borrow().room.id.clone();
+                switch.set_sensitive(false);
+
+                thread::spawn(move || {
+                    if let Err(err) = room::set_pushrules(server, access_token, room_id, notify) {
+                        err.handle_error();
+                    }
+                    let sensitive = true;
+                    APPOP!(set_notifications_switch, (active, sensitive));
+                });
+            }));
+
+        self.switch_handler = Some(Rc::new(switch_handler));
     }
 
     fn init_room_settings(&mut self) {
@@ -220,6 +246,7 @@ impl RoomSettings {
         self.room_settings_show_room_topic(topic, is_room, edit);
         self.room_settings_show_room_type(description);
         self.room_settings_show_members(members);
+        self.room_settings_show_notifications();
 
         /* admin parts */
         self.room_settings_show_group_room(is_room || is_group);
@@ -612,10 +639,6 @@ impl RoomSettings {
             .builder
             .get_object::<gtk::Frame>("room_settings_media")
             .expect("Can't find room_settings_media in ui file.");
-        let switch = self
-            .builder
-            .get_object::<gtk::Frame>("room_settings_notification_switch")
-            .expect("Can't find room_settings_notification_switch in ui file.");
         let history = self
             .builder
             .get_object::<gtk::Frame>("room_settings_history_visibility")
@@ -630,7 +653,6 @@ impl RoomSettings {
             .expect("Can't find room_settings_room_visibility in ui file.");
         notification.hide();
         media.hide();
-        switch.hide();
         history.hide();
         room.hide();
         join.hide();
@@ -668,5 +690,55 @@ impl RoomSettings {
         b.add(&w);
         self.members_list = Some(list);
         None
+    }
+
+    fn room_settings_show_notifications(&mut self) {
+        let switch = self
+            .builder
+            .get_object::<gtk::Switch>("room_settings_notification_switch")
+            .expect("Can't find room_settings_notification_switch in ui file.");
+
+        switch.set_sensitive(false);
+
+        let server = self.server_url.clone();
+        let access_token = self.access_token.clone();
+        let room_id = self.room.id.clone();
+
+        thread::spawn(move || {
+            let mut active = true;
+            let mut sensitive = true;
+            match room::get_pushrules(server, access_token, room_id) {
+                Ok(room::RoomNotify::DontNotify) => {
+                    active = false;
+                }
+                Err(err) => {
+                    err.handle_error();
+                    active = false;
+                    sensitive = false;
+                }
+                _ => {}
+            };
+            APPOP!(set_notifications_switch, (active, sensitive));
+        });
+    }
+
+    pub fn set_notifications_switch(&self, active: bool, sensitive: bool) {
+        let switch = self
+            .builder
+            .get_object::<gtk::Switch>("room_settings_notification_switch")
+            .expect("Can't find room_settings_notification_switch in ui file.");
+
+        if let Some(handler) = &self.switch_handler {
+            println!("handler block");
+            switch.block_signal(&handler);
+        }
+
+        switch.set_active(active);
+        switch.set_sensitive(sensitive);
+
+        if let Some(handler) = &self.switch_handler {
+            println!("handler unblock");
+            switch.unblock_signal(&handler);
+        }
     }
 }

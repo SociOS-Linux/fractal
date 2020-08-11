@@ -8,6 +8,7 @@ pub mod media;
 pub mod membership;
 pub mod message;
 pub mod profile;
+pub mod pushrules;
 pub mod read_marker;
 pub mod redact;
 pub mod room;
